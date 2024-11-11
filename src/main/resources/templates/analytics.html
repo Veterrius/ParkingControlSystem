@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Analytics</title>
+    <link rel="stylesheet" href="/static/general.css">
+</head>
+<body>
+<div class="container">
+    <a href="#" class="back-button"><-</a>
+    <h2>Analytics</h2>
+
+    <div class="split-container">
+        <div class="left-panel">
+            <div class="characteristics">
+                <div class="characteristic">
+                    <input type="checkbox" id="char1">
+                    <input type="text" placeholder="Characteristic 1" class="input-field">
+                </div>
+                <div class="characteristic">
+                    <input type="checkbox" id="char2">
+                    <input type="text" placeholder="Characteristic 2" class="input-field">
+                </div>
+                <div class="characteristic">
+                    <input type="checkbox" id="char3">
+                    <input type="text" placeholder="Characteristic 3" class="input-field">
+                </div>
+                <button class="btn btn-apply">Apply</button>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="scrollable-list">
+                <div th:each="parking : ${parkings}" class="list-item">
+                    <div class="parking-info">
+                        <span th:text="${parking.name}">Parking Name</span>
+                        <span th:text="${parking.occupancy + '/' + parking.capacity}">45/50</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

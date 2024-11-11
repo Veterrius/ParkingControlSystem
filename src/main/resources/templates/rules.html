@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Rules</title>
+    <link rel="stylesheet" href="/static/general.css">
+</head>
+<body>
+<div class="container">
+    <a href="#" class="back-button"><-</a>
+    <h2>Rules</h2>
+
+    <div class="scrollable-list">
+        <div th:each="rule : ${rules}" class="list-item">
+            <span th:text="${rule.description}">Rule description</span>
+        </div>
+    </div>
+</div>
+</body>
+</html>

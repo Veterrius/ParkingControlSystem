@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Personal Information</title>
+    <link rel="stylesheet" href="/static/general.css">
+</head>
+<body>
+<div class="container">
+    <a href="#" class="back-button"><-</a>
+    <h2>Personal Information</h2>
+
+    <div class="info-section">
+        <div class="info-group">
+            <span class="info-label">Username</span>
+            <div class="info-value" th:text="${user.username}"></div>
+        </div>
+
+        <div class="info-group">
+            <span class="info-label">Email</span>
+            <div class="info-value" th:text="${user.email}"></div>
+        </div>
+
+        <div class="info-group">
+            <span class="info-label">Credit Cards</span>
+            <div class="info-value" th:text="${user.creditCards}"></div>
+        </div>
+
+        <div class="info-group">
+            <span class="info-label">Parking History</span>
+            <div class="info-value history-value" th:text="${user.parkingHistory}"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
