@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Modify Rules</title>
+  <link rel="stylesheet" href="/css/general.css">
+  <script>
+    function toggleEdit(ruleId) {
+      const labelElement = document.getElementById('label-' + ruleId);
+      const editElement = document.getElementById('edit-' + ruleId);
+      const checkbox = document.getElementById('checkbox-' + ruleId);
+
+      if (checkbox.checked) {
+        labelElement.style.display = 'none';
+        editElement.style.display = 'block';
+        editElement.value = labelElement.textContent;
+      } else {
+        labelElement.style.display = 'block';
+        editElement.style.display = 'none';
+      }
+    }
+
+    function updateRule() {
+      const selected = []
+      document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+        selected.push(checkbox.getAttribute('data-rule-id'));
+      });
+      if (selected.length !== 1) {
+        alert("You must select only one rule")
+        return
+      }
+      const ruleId = selected[0];
+      const editElement = document.getElementById('edit-' + ruleId);
+      const newText = editElement.value;
+
+      fetch('/rules/update', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: ruleId,
+          body: newText
+        })
+      }).then(response => {
+        if (response.ok) {
+          location.reload();
+        }
+      });
+    }
+
+    function showAddForm() {
+      document.getElementById('button-container').style.display = 'none';
+      document.getElementById('add-form').style.display = 'block';
+    }
+
+    function hideAddForm() {
+      document.getElementById('button-container').style.display = 'block';
+      document.getElementById('add-form').style.display = 'none';
+    }
+
+    function addRule() {
+      const title = document.getElementById('new-rule-title').value;
+      const body = document.getElementById('new-rule-body').value;
+
+      fetch('/rules', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: title,
+          body: body
+        })
+      }).then(response => {
+        if (response.ok) {
+          location.reload();
+        }
+      });
+    }
+
+    function deleteSelectedRules() {
+      const selectedRules = [];
+      document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+        selectedRules.push(checkbox.getAttribute('data-rule-id'));
+      });
+
+      if (selectedRules.length > 0) {
+        fetch('/rules/delete', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ids: selectedRules
+          })
+        }).then(response => {
+          if (response.ok) {
+            location.reload();
+          }
+        });
+      }
+    }
+  </script>
+</head>
+<body>
+<div class="container">
+  <a href="javascript:history.back()" class="back-button"><span>&#8592;</span></a>
+  <h2>Modify Rules</h2>
+
+  <div class="modify-rules-container">
+    <div id="button-container" class="buttons-container">
+      <button class="btn btn-apply" onclick="updateRule()">Update</button>
+      <button class="btn btn-delete" onclick="deleteSelectedRules()">Delete</button>
+      <button class="btn btn-modify" onclick="showAddForm()">Add</button>
+    </div>
+
+    <div id="add-form" class="buttons-container" style="display: none;">
+      <input type="text" id="new-rule-title" class="input-field" placeholder="Enter rule title">
+      <input type="text" id="new-rule-body" class="input-field" placeholder="Enter rule body">
+      <button class="btn btn-apply" onclick="addRule()">Add</button>
+      <button class="btn btn-delete" onclick="hideAddForm()">Back</button>
+    </div>
+
+    <div class="scrollable-list">
+      <div th:each="rule : ${rules}" class="list-item">
+        <input type="checkbox"
+               th:id="${'checkbox-' + rule.getId()}"
+               th:data-rule-id="${rule.getId()}"
+               onchange="toggleEdit(this.getAttribute('data-rule-id'))">
+        <label th:id="${'label-' + rule.getId()}" th:text="${rule.getBody()}">Rule description</label>
+        <textarea th:id="${'edit-' + rule.getId()}"
+                  class="input-field"
+                  style="display: none; width: 100%;"
+                  rows="3"
+                  th:text="${rule.getBody()}"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

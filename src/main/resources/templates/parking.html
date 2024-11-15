@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Parking</title>
+    <link rel="stylesheet" href="/css/general.css">
+    <style>
+        .list-item {
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .list-item:hover {
+            background-color: #f0f8ff; /* Light blue highlight on hover */
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="javascript:history.back()" class="back-button"><span>&#8592;</span></a>
+    <h2>Parking</h2>
+    <p>List of parking lots</p>
+
+    <div class="scrollable-list">
+        <div th:each="parking : ${parkings}" class="list-item"
+             th:onclick="|window.location.href='/reservation/' + '${parking.getId()}'|"
+             th:id="'parking-' + ${parking.getId()}">
+            <div class="parking-info">
+                <span th:text="${parking.getName()}">Parking Name</span>
+                <span th:text="${'free ' + parking.getFreeNumberOfSpace() + '/' + parking.getTotalNumberOfSpace()}">Available</span>
+                <span class="price" th:text="'Cost: ' + ${parking.getPrice()}">Cost</span>
+                <span class="working-time" th:text="'Working Time: ' + ${parking.getWorkingTime()}">Working Time</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

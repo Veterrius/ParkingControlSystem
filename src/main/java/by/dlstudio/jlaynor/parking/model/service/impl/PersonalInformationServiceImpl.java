@@ -15,4 +15,9 @@ public class PersonalInformationServiceImpl implements PersonalInformationServic
     public User getUser(Integer id) {
         return informationRepository.getUserById(id);
     }
+
+    @Override
+    public Boolean updateUser(User user) {
+        return informationRepository.save(user).getId() != null;
+    }
 }

@@ -20,6 +20,14 @@ body {
     display: inline-block;
 }
 
+.menu-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 40px;
+}
+
 /* Authorization Styles */
 .auth-container {
     width: 300px;
@@ -58,10 +66,37 @@ body {
     margin: 5px 5px 10px;
 }
 
+
+.menu-button {
+    width: 200px;
+    padding: 15px;
+    border: none;
+    border-radius: 25px;
+    background-color: #5BC0DE;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+.menu-button:hover {
+    transform: scale(1.05);
+}
+
+.modify-rules-container {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 30px;
+    padding: 20px;
+}
+
 .btn-login { background-color: #5BC0DE; }
 .btn-signup { background-color: #5FB75F; }
 .btn-apply { background-color: #5BC0DE; }
 .btn-modify { background-color: #5FB75F; }
+.btn-delete { background-color: #D9534F;}
 
 /* Split Layout Styles */
 .split-container {

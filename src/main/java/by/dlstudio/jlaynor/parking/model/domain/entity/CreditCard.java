@@ -18,8 +18,12 @@ public class CreditCard {
     private Integer cvc;
 
     @Column(name = "card_date", nullable = false)
-    private Date cardDate;
+    private String cardDate;
 
     @Column(name = "balance")
     private Float balance;
+
+    public String getLastFourDigits() {
+        return cardNumber.substring(cardNumber.length() - 4);
+    }
 }

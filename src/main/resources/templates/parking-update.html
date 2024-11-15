@@ -2,37 +2,156 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Parking Update</title>
-    <link rel="stylesheet" href="/static/general.css">
+    <link rel="stylesheet" href="/css/general.css">
+    <style>
+        .selected {
+            background-color: #e6f3ff !important;
+            border: 2px solid #5BC0DE !important;
+        }
+
+        .list-item {
+            transition: background-color 0.2s ease;
+            padding: 10px;
+            margin: 5px 0;
+            border: 2px solid transparent;
+            border-radius: 4px;
+        }
+
+        .list-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .characteristic {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .characteristic label {
+            min-width: 100px;
+        }
+    </style>
+    <script>
+        let selectedParkingId = null;
+
+        function selectParking(parkingId) {
+            document.querySelectorAll('.list-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+
+            const parkingElement = document.getElementById('parking-' + parkingId);
+            parkingElement.classList.add('selected');
+            selectedParkingId = parkingId;
+
+            const priceSpan = parkingElement.querySelector('.price');
+            const workingTimeSpan = parkingElement.querySelector('.working-time');
+
+            if (priceSpan) {
+                document.getElementById('priceInput').value =
+                    priceSpan.textContent.replace('Cost: ', '');
+            }
+
+            if (workingTimeSpan) {
+                document.getElementById('workingTimeInput').value =
+                    workingTimeSpan.textContent.replace('Working Time: ', '');
+            }
+        }
+
+        function updateParking() {
+            if (!selectedParkingId) {
+                alert('Please select a parking first');
+                return;
+            }
+
+            const characteristics = [];
+
+            // Get price if checked
+            if (document.getElementById('priceCheckbox').checked) {
+                characteristics.push({
+                    type: 'PRICE',
+                    value: document.getElementById('priceInput').value
+                });
+            }
+
+            // Get working time if checked
+            if (document.getElementById('workingTimeCheckbox').checked) {
+                characteristics.push({
+                    type: 'WORKING_TIME',
+                    value: document.getElementById('workingTimeInput').value
+                });
+            }
+
+            if (characteristics.length === 0) {
+                alert('Please check and fill at least one field');
+                return;
+            }
+
+            fetch('parking/update', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    parkingId: selectedParkingId,
+                    characteristics: characteristics
+                })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error(text);
+                        });
+                    }
+                    return response;
+                })
+                .then(() => {
+                    location.reload();
+                })
+                .catch(error => {
+                    alert('Error: ' + error.message);
+                });
+        }
+    </script>
 </head>
 <body>
 <div class="container">
-    <a href="#" class="back-button"><-</a>
+    <a href="javascript:history.back()" class="back-button"><span>&#8592;</span></a>
     <h2>Parking Update</h2>
 
     <div class="split-container">
         <div class="left-panel">
             <div class="characteristics">
                 <div class="characteristic">
-                    <input type="checkbox" id="char1">
-                    <input type="text" placeholder="Characteristic 1" class="input-field">
+                    <input type="checkbox" id="priceCheckbox">
+                    <label for="priceInput">Price:</label>
+                    <input type="number" id="priceInput" placeholder="Enter price" class="input-field" step="0.01">
                 </div>
                 <div class="characteristic">
-                    <input type="checkbox" id="char2">
-                    <input type="text" placeholder="Characteristic 2" class="input-field">
+                    <input type="checkbox" id="workingTimeCheckbox">
+                    <label for="workingTimeInput">Working Time:</label>
+                    <input type="text" id="workingTimeInput" placeholder="Enter working time" class="input-field">
                 </div>
                 <div class="btn-group">
-                    <button class="btn btn-apply">Apply</button>
-                    <button class="btn btn-modify">Modify Rules</button>
+                    <button class="btn btn-apply" onclick="updateParking()">Apply</button>
+                    <a href="/rules"><button class="btn btn-modify" onclick>Modify Rules</button></a>
                 </div>
             </div>
         </div>
 
         <div class="right-panel">
             <div class="scrollable-list">
-                <div th:each="parking : ${parkings}" class="list-item">
+                <div th:each="parking : ${parkings}"
+                     class="list-item"
+                     th:id="${'parking-' + parking.getId()}"
+                     th:onclick="'selectParking(' + ${parking.getId()} + ')'"
+                     style="cursor: pointer;">
                     <div class="parking-info">
-                        <span th:text="${parking.name}">Parking Name</span>
-                        <span th:text="${parking.status}">Available</span>
+                        <span th:text="${parking.getName()}">Parking Name</span>
+                        <span th:text="${'free ' + parking.getFreeNumberOfSpace() +
+                        '/' + parking.getTotalNumberOfSpace()}">Available</span>
+                        <span class="price" th:text="'Cost: ' + ${parking.getPrice()}">Cost</span>
+                        <span class="working-time" th:text="'Working Time: ' + ${parking.getWorkingTime()}">Working Time</span>
                     </div>
                 </div>
             </div>

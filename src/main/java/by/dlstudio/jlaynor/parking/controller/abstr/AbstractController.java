@@ -29,4 +29,10 @@ public abstract class AbstractController {
             throw new AccessDeniedException("Insufficient privileges");
         }
     }
+
+    protected void requireAuth() throws AccessDeniedException {
+        if (currentUser == null) {
+            throw new AccessDeniedException("Must be authorized");
+        }
+    }
 }

@@ -6,4 +6,5 @@ public interface PersonalInformationService {
 
     User getUser(Integer id);
 
+    Boolean updateUser(User user);
 }

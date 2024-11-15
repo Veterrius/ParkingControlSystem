@@ -2,7 +2,9 @@ package by.dlstudio.jlaynor.parking.controller.impl;
 
 import by.dlstudio.jlaynor.parking.controller.abstr.AbstractController;
 import by.dlstudio.jlaynor.parking.model.domain.entity.User;
+import by.dlstudio.jlaynor.parking.model.domain.enums.Role;
 import by.dlstudio.jlaynor.parking.model.domain.other.LoginRequest;
+import by.dlstudio.jlaynor.parking.model.domain.other.SignUpRequest;
 import by.dlstudio.jlaynor.parking.model.service.AuthenticationService;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
@@ -22,7 +24,22 @@ public class AuthenticationControllerImpl extends AbstractController {
     @GetMapping("/login")
     public String showLoginForm(Model model) {
         model.addAttribute("loginRequest", new LoginRequest());
-        return "auth/login";
+        return "login";
+    }
+
+    @GetMapping("/signup")
+    public String showSignUpForm(Model model) {
+        model.addAttribute("signUpRequest", new SignUpRequest());
+        return "register";
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        if (currentUser != null) {
+            currentUser = null;
+            session.setAttribute("currentUser", null);
+        }
+        return "redirect:/";
     }
 
     @PostMapping("/login")
@@ -31,10 +48,20 @@ public class AuthenticationControllerImpl extends AbstractController {
         if (user != null) {
             session.setAttribute("currentUser", user);
             setCurrentUser(user);
-            return "redirect:/parking";
+            return "redirect:/";
         }
         return "redirect:/auth/login?error";
     }
 
-    
+    @PostMapping("/signup")
+    public String signUp(@ModelAttribute SignUpRequest signUpRequest) {
+        User user = new User();
+        user.setName(signUpRequest.getName());
+        user.setPassword(signUpRequest.getPassword());
+        user.setEmail(signUpRequest.getEmail());
+        user.setRole(Role.USER);
+        if (authService.register(user)) return "redirect:/auth/login";
+        return "redirect: /auth/login?error";
+    }
+
 }

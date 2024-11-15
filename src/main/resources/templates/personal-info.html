@@ -2,32 +2,32 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Personal Information</title>
-    <link rel="stylesheet" href="/static/general.css">
+    <link rel="stylesheet" href="/css/general.css">
 </head>
 <body>
 <div class="container">
-    <a href="#" class="back-button"><-</a>
+    <a href="javascript:history.back()" class="back-button"><span>&#8592;</span></a>
     <h2>Personal Information</h2>
 
     <div class="info-section">
         <div class="info-group">
             <span class="info-label">Username</span>
-            <div class="info-value" th:text="${user.username}"></div>
+            <div class="info-value" th:text="${user.getName()}"></div>
         </div>
 
         <div class="info-group">
             <span class="info-label">Email</span>
-            <div class="info-value" th:text="${user.email}"></div>
+            <div class="info-value" th:text="${user.getEmail()}"></div>
         </div>
 
         <div class="info-group">
             <span class="info-label">Credit Cards</span>
-            <div class="info-value" th:text="${user.creditCards}"></div>
+            <div class="info-value" th:text="${user.getCreditCards()}"></div>
         </div>
 
         <div class="info-group">
             <span class="info-label">Parking History</span>
-            <div class="info-value history-value" th:text="${user.parkingHistory}"></div>
+            <div class="info-value history-value" th:text="${user.getParkingHistories()}"></div>
         </div>
     </div>
 </div>

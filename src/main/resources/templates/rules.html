@@ -2,16 +2,17 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Rules</title>
-    <link rel="stylesheet" href="/static/general.css">
+    <link rel="stylesheet" href="/css/general.css">
 </head>
 <body>
 <div class="container">
-    <a href="#" class="back-button"><-</a>
+    <a href="javascript:history.back()" class="back-button"><span>&#8592;</span></a>
     <h2>Rules</h2>
 
     <div class="scrollable-list">
         <div th:each="rule : ${rules}" class="list-item">
-            <span th:text="${rule.description}">Rule description</span>
+            <b><span th:text="${rule.getTitle()}">Rule Title</span></b>
+            <span th:text="${rule.getBody()}">Rule description</span>
         </div>
     </div>
 </div>

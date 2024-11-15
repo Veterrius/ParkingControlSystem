@@ -2,14 +2,14 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Authorization</title>
-    <link rel="stylesheet" href="/static/general.css">
+    <link rel="stylesheet" href="/css/general.css">
 </head>
 <body>
 <div class="auth-container">
     <h2>Authorization</h2>
     <form th:action="@{/auth/login}" method="post">
         <div class="form-group">
-            <input type="text" name="username" placeholder="Username" class="input-field" required>
+            <input type="text" name="loginEmail" placeholder="Email" class="input-field" required>
         </div>
         <div class="form-group">
             <input type="password" name="password" placeholder="Password" class="input-field" required>

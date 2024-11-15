@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Registration</title>
+    <link rel="stylesheet" href="/css/general.css">
+</head>
+<body>
+<a href="javascript:history.back()" class="back-button"><span>&#8592;</span></a>
+<div class="auth-container">
+    <h2>Authorization</h2>
+    <form th:action="@{/auth/signup}" method="post">
+        <div class="form-group">
+            <input type="text" name="name" placeholder="Name" class="input-field" required>
+        </div>
+        <div class="form-group">
+            <input type="text" name="email" placeholder="Email" class="input-field" required>
+        </div>
+        <div class="form-group">
+            <input type="password" name="password" placeholder="Password" class="input-field" required>
+        </div>
+        <button type="submit" class="btn btn-login">Create</button>
+    </form>
+</div>
+</body>
+</html>
