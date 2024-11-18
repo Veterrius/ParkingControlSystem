@@ -1,5 +1,6 @@
 package by.dlstudio.jlaynor.parking.controller.impl;
 
+import by.dlstudio.jlaynor.parking.controller.RulesController;
 import by.dlstudio.jlaynor.parking.controller.abstr.AbstractController;
 import by.dlstudio.jlaynor.parking.model.domain.entity.Rule;
 import by.dlstudio.jlaynor.parking.model.domain.enums.Role;
@@ -17,9 +18,10 @@ import java.security.InvalidParameterException;
 @AllArgsConstructor
 @Controller
 @RequestMapping("/rules")
-public class RulesControllerImpl extends AbstractController {
+public class RulesControllerImpl extends AbstractController implements RulesController {
     private final RulesService rulesService;
 
+    @Override
     @GetMapping
     public String showAllRules(Model model) throws AccessDeniedException {
         requireAuth();
@@ -27,6 +29,7 @@ public class RulesControllerImpl extends AbstractController {
         return currentUser.getRole().equals(Role.ADMIN) ? "modify-rules" : "rules";
     }
 
+    @Override
     @PostMapping
     public String addRule(@RequestBody RuleDTO ruleDTO) throws AccessDeniedException {
         requireRole(Role.ADMIN);
@@ -40,6 +43,7 @@ public class RulesControllerImpl extends AbstractController {
         return "redirect:/rules?error";
     }
 
+    @Override
     @PutMapping("/update")
     public ResponseEntity<Void> updateRule(@RequestBody RuleDTO ruleDTO) throws AccessDeniedException {
         requireRole(Role.ADMIN);
@@ -53,6 +57,7 @@ public class RulesControllerImpl extends AbstractController {
         return ResponseEntity.badRequest().build();
     }
 
+    @Override
     @DeleteMapping("/delete")
     public ResponseEntity<Void> deleteRules(@RequestBody RuleDTO ruleDTO) throws AccessDeniedException {
         requireRole(Role.ADMIN);

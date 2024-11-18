@@ -1,5 +1,6 @@
 package by.dlstudio.jlaynor.parking.controller.impl;
 
+import by.dlstudio.jlaynor.parking.controller.AuthenticationController;
 import by.dlstudio.jlaynor.parking.controller.abstr.AbstractController;
 import by.dlstudio.jlaynor.parking.model.domain.entity.User;
 import by.dlstudio.jlaynor.parking.model.domain.enums.Role;
@@ -18,21 +19,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @AllArgsConstructor
 @Controller
 @RequestMapping("/auth")
-public class AuthenticationControllerImpl extends AbstractController {
+public class AuthenticationControllerImpl extends AbstractController implements AuthenticationController {
     private final AuthenticationService authService;
 
+    @Override
     @GetMapping("/login")
     public String showLoginForm(Model model) {
         model.addAttribute("loginRequest", new LoginRequest());
         return "login";
     }
 
+    @Override
     @GetMapping("/signup")
     public String showSignUpForm(Model model) {
         model.addAttribute("signUpRequest", new SignUpRequest());
         return "register";
     }
 
+    @Override
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         if (currentUser != null) {
@@ -42,6 +46,7 @@ public class AuthenticationControllerImpl extends AbstractController {
         return "redirect:/";
     }
 
+    @Override
     @PostMapping("/login")
     public String login(@ModelAttribute LoginRequest loginRequest, HttpSession session) {
         User user = authService.login(loginRequest.getLoginEmail(), loginRequest.getPassword());
@@ -53,6 +58,7 @@ public class AuthenticationControllerImpl extends AbstractController {
         return "redirect:/auth/login?error";
     }
 
+    @Override
     @PostMapping("/signup")
     public String signUp(@ModelAttribute SignUpRequest signUpRequest) {
         User user = new User();

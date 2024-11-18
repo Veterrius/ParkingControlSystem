@@ -19,4 +19,10 @@ public class ParkingHistory {
 
     @Column(name = "parking_name", nullable = false)
     private String parkingName;
+
+    @Column(name = "reserved_lots", nullable = false)
+    private Integer reservedLots;
+
+    @Column(name = "full_hours", nullable = false)
+    private Integer fullHours;
 }

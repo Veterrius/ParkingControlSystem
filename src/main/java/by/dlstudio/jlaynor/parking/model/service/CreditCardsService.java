@@ -10,4 +10,5 @@ public interface CreditCardsService {
 
     Boolean addCreditCard(CreditCard creditCard);
 
+    CreditCard refreshCreditCard(CreditCard creditCard);
 }

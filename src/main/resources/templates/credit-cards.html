@@ -105,7 +105,7 @@
         })
             .then(response => {
                 if (response.ok) {
-                    window.history.back();
+                    window.location.href = '/parking';
                 } else {
                     throw new Error('Failed to select card');
                 }

@@ -36,4 +36,14 @@ public class ParkingServiceImpl implements ParkingService {
     public ParkingHistory saveParkingHistory(ParkingHistory parkingHistory) {
         return parkingHistoryRepository.save(parkingHistory);
     }
+
+    @Override
+    public Optional<Parking> getParkingByName(String parkingName) {
+        return parkingRepository.findParkingByName(parkingName);
+    }
+
+    @Override
+    public List<ParkingHistory> getParkingHistories(Parking parking) {
+        return parkingHistoryRepository.findParkingHistoriesByParkingName(parking.getName());
+    }
 }

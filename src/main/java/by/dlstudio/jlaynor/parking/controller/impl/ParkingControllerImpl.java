@@ -1,8 +1,8 @@
 package by.dlstudio.jlaynor.parking.controller.impl;
 
+import by.dlstudio.jlaynor.parking.controller.ParkingController;
 import by.dlstudio.jlaynor.parking.controller.abstr.AbstractController;
 import by.dlstudio.jlaynor.parking.model.domain.entity.Parking;
-import by.dlstudio.jlaynor.parking.model.domain.entity.Rule;
 import by.dlstudio.jlaynor.parking.model.domain.enums.Role;
 import by.dlstudio.jlaynor.parking.model.domain.other.ParkingDTO;
 import by.dlstudio.jlaynor.parking.model.service.ParkingService;
@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.AccessDeniedException;
 import java.security.InvalidParameterException;
-import java.util.LinkedHashMap;
 
 @AllArgsConstructor
 @Controller
 @RequestMapping("/parking")
-public class ParkingControllerImpl extends AbstractController {
+public class ParkingControllerImpl extends AbstractController implements ParkingController {
     private ParkingService parkingService;
 
+    @Override
     @GetMapping
     public String showAllParkings(Model model) throws AccessDeniedException {
         requireAuth();
@@ -29,6 +29,7 @@ public class ParkingControllerImpl extends AbstractController {
         return currentUser.getRole().equals(Role.ADMIN) ? "parking-update" : "parking";
     }
 
+    @Override
     @PutMapping("/update")
     public ResponseEntity<Void> updateParking(@RequestBody ParkingDTO parkingDTO) throws AccessDeniedException {
         requireRole(Role.ADMIN);
@@ -39,10 +40,13 @@ public class ParkingControllerImpl extends AbstractController {
             switch (characteristic.get("type")) {
                 case "PRICE":
                     updatedParking.setPrice(Float.valueOf(characteristic.get("value")));
+                    break;
                 case "WORKING_TIME":
                     updatedParking.setWorkingTime(characteristic.get("value"));
+                    break;
             }
         }
+        updatedParking.getListOfAdministrators().add(currentUser);
         if (parkingService.updateParking(updatedParking)) {
             return ResponseEntity.ok().build();
         }

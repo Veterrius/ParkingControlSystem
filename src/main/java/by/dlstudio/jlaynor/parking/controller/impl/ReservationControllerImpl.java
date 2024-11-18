@@ -1,14 +1,13 @@
 package by.dlstudio.jlaynor.parking.controller.impl;
 
+import by.dlstudio.jlaynor.parking.controller.ReservationController;
 import by.dlstudio.jlaynor.parking.controller.abstr.AbstractController;
-import by.dlstudio.jlaynor.parking.model.domain.entity.CreditCard;
 import by.dlstudio.jlaynor.parking.model.domain.entity.Parking;
 import by.dlstudio.jlaynor.parking.model.domain.entity.ParkingHistory;
 import by.dlstudio.jlaynor.parking.model.domain.other.CreditCardDTO;
 import by.dlstudio.jlaynor.parking.model.domain.other.ReservationDTO;
-import by.dlstudio.jlaynor.parking.model.service.CreditCardsService;
 import by.dlstudio.jlaynor.parking.model.service.ParkingService;
-import by.dlstudio.jlaynor.parking.model.service.PersonalInformationService;
+import by.dlstudio.jlaynor.parking.model.service.ReservationService;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,31 +17,25 @@ import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.AccessDeniedException;
 import java.security.InvalidParameterException;
-import java.sql.Date;
-import java.sql.Time;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Controller
 @RequestMapping("/reservation")
-public class ReservationControllerImpl extends AbstractController {
-    private final CreditCardsService creditCardsService;
-    private final PersonalInformationService personalInformationService;
+public class ReservationControllerImpl extends AbstractController implements ReservationController {
     private final ParkingService parkingService;
+    private final ReservationService reservationService;
 
+    @Override
     @GetMapping("{parkingId}")
-    public String showParkingReservation(@PathVariable Integer parkingId, Model model, HttpSession session) throws AccessDeniedException {
+    public String showParkingReservation(@PathVariable Integer parkingId, Model model) throws AccessDeniedException {
         requireAuth();
         Parking reservedParking = parkingService.getParkingById(parkingId).orElseThrow(
                 () -> new InvalidParameterException("Wrong parking selected"));
         model.addAttribute("parking", reservedParking);
-        session.setAttribute("parking", reservedParking);
         return "reservation";
     }
 
+    @Override
     @GetMapping("/payment")
     public String showCreditCards(Model model) throws AccessDeniedException {
         requireAuth();
@@ -50,47 +43,36 @@ public class ReservationControllerImpl extends AbstractController {
         return "credit-cards";
     }
 
+    @Override
     @PostMapping
     public ResponseEntity<Void> applyReservation(@RequestBody ReservationDTO reservationDTO, HttpSession session) throws AccessDeniedException {
         requireAuth();
-        ParkingHistory parkingHistory = new ParkingHistory();
-        parkingHistory.setParkingName(parkingService.getParkingById(reservationDTO.getParkingId()).orElseThrow(
-                () -> new InvalidParameterException("Wrong parking")).getName()
-        );
-        parkingHistory.setDate(Date.valueOf(LocalDate.now()));
-        session.setAttribute("newParkingHistory", parkingHistory);
+        ParkingHistory newParkingHistory = reservationService.applyReservation(reservationDTO);
+        session.setAttribute("newParkingHistory", newParkingHistory);
         return ResponseEntity.ok().build();
     }
 
+    @Override
     @PostMapping("/payment")
     public ResponseEntity<Void> addCreditCard(@RequestBody CreditCardDTO creditCardDTO) throws AccessDeniedException {
         requireAuth();
-        CreditCard creditCard = new CreditCard();
-        creditCard.setCardNumber(creditCardDTO.getCardNumber());
-        creditCard.setCvc(creditCardDTO.getCvc());
-        creditCard.setCardDate(creditCardDTO.getExpirationDate());
-        if (creditCardsService.addCreditCard(creditCard)) {
-            currentUser.getCreditCards().add(creditCard);
-            personalInformationService.updateUser(currentUser);
+        if (reservationService.addCreditCard(creditCardDTO, currentUser)) {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.badRequest().build();
     }
 
+    @Override
     @PutMapping
     public ResponseEntity<Void> confirmReservation(@RequestBody CreditCardDTO creditCardDTO,
-                                                   @SessionAttribute ParkingHistory newParkingHistory,
-                                                   @SessionAttribute Parking parking) throws AccessDeniedException {
+                                                   @SessionAttribute ParkingHistory newParkingHistory) throws AccessDeniedException {
         requireAuth();
-        CreditCard userCreditCard = currentUser.getCreditCards().stream()
-                        .filter(a -> a.getCardNumber().equals(creditCardDTO.getCardNumber()))
-                        .toList().get(0);
-        if (userCreditCard.getBalance() >= Objects.requireNonNull(parking).getPrice()) {
-            userCreditCard.setBalance(userCreditCard.getBalance() - parking.getPrice());
-            creditCardsService.addCreditCard(userCreditCard);
-            newParkingHistory = parkingService.saveParkingHistory(newParkingHistory);
-            currentUser.getParkingHistories().add(newParkingHistory);
-            personalInformationService.updateUser(currentUser);
+        int parkings_before_reservation = currentUser.getParkingHistories().size();
+        if (parkings_before_reservation < reservationService.reserveParking(
+                creditCardDTO.getCardNumber(),
+                currentUser,
+                newParkingHistory
+        ).getParkingHistories().size()) {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.badRequest().build();
